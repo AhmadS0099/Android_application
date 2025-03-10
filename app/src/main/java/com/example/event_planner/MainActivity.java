@@ -1,12 +1,9 @@
 package com.example.event_planner;
 
 import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import com.example.event_planner.ui.login.LoginFragment;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -14,11 +11,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Laad het eerste scherm
+        // Load LoginFragment when the app starts
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, new EventListFragment())
+                    .replace(R.id.fragment_container, new LoginFragment())
                     .commit();
         }
+    }
+
+    // Method to replace the fragment after login
+    public void navigateToEventList() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new EventListFragment())
+                .addToBackStack(null)
+                .commit();
     }
 }

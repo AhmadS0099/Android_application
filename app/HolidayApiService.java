@@ -1,4 +1,4 @@
-package com.example.event_planner;
+package com.example.event_planner.HolidayApiService;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
