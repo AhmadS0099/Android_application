@@ -1,22 +1,28 @@
 package com.example.event_planner;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.fragment.app.Fragment;
+
 import com.example.event_planner.Remote.IpService;
+import com.example.event_planner.local.HolidayDatabase;
 import com.example.event_planner.model.Ip;
-import java.text.SimpleDateFormat;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -24,40 +30,54 @@ import retrofit2.Response;
 public class EventListFragment extends Fragment {
     private IpService mService;
     private ListView listView;
-    private Button btnGetHoliday;
-    private TextView txtTodayDate; // TextView to display today's date
+    private Button btnGetHoliday, btnAddHoliday;
+    private EditText inputDate, inputName;
+    private TextView txtTodayDate;
+    private HolidayDatabase db;
+    private ArrayAdapter<String> adapter;
+    private List<Ip> holidayList = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_list, container, false);
 
-        // Initialize views
+        // Initialize UI elements
         listView = view.findViewById(R.id.List_Of_Holiday);
         btnGetHoliday = view.findViewById(R.id.btn_Get_Holiday_Web);
+        btnAddHoliday = view.findViewById(R.id.btn_add_holiday);
+        inputDate = view.findViewById(R.id.input_date);
+        inputName = view.findViewById(R.id.input_name);
+        txtTodayDate = view.findViewById(R.id.txt_today_date);
         Button btnGoToDetail = view.findViewById(R.id.btn_go_to_detail);
-        txtTodayDate = view.findViewById(R.id.txt_today_date); // Get reference to the TextView
 
-        // Setup service
+        // Initialize Room Database
+        db = HolidayDatabase.getInstance(requireContext());
+
+        // Initialize Retrofit service
         mService = Common.getIpService();
 
-        // Set today's date
+        // Display today's date
         setTodayDate();
 
-        // Button click listeners
+        // Load holidays from local database
+        loadHolidaysFromDatabase();
+
+        // Fetch from the internet (only if the database is empty)
         btnGetHoliday.setOnClickListener(v -> fetchHolidays());
+
+        // Add custom holiday
+        btnAddHoliday.setOnClickListener(v -> addCustomHoliday());
+
+        // Navigate to detail fragment
         btnGoToDetail.setOnClickListener(v -> navigateToDetail());
 
         return view;
     }
 
     private void setTodayDate() {
-        // Get today's date
         LocalDate today = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
-        String formattedDate = today.format(formatter);
-
-        // Set the formatted date in the TextView
-        txtTodayDate.setText("Today's Date: " + formattedDate);
+        txtTodayDate.setText("Today's Date: " + today.format(formatter));
     }
 
     private void fetchHolidays() {
@@ -65,27 +85,10 @@ public class EventListFragment extends Fragment {
             @Override
             public void onResponse(Call<List<Ip>> call, Response<List<Ip>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<String> holidayStrings = new ArrayList<>();
-                    LocalDate today = LocalDate.now();
+                    holidayList = response.body();
 
-                    for (Ip holiday : response.body()) {
-                        // Convert holiday date to LocalDate
-                        String holidayDateString = holiday.getDate(); // e.g., "2025-12-25"
-                        LocalDate holidayDate = LocalDate.parse(holidayDateString);
-
-                        // Only show upcoming holidays (not passed)
-                        if (!holidayDate.isBefore(today)) {
-                            holidayStrings.add(holiday.getLocalName() + " - " + holiday.getDate());
-                        }
-                    }
-
-                    // Show holidays in ListView
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                            requireContext(),
-                            android.R.layout.simple_list_item_1,
-                            holidayStrings
-                    );
-                    listView.setAdapter(adapter);
+                    // Save to local database (overwrite existing)
+                    new SaveHolidaysTask().execute(holidayList);
                 } else {
                     Toast.makeText(getContext(), "No data found", Toast.LENGTH_SHORT).show();
                 }
@@ -98,10 +101,90 @@ public class EventListFragment extends Fragment {
         });
     }
 
+    private void addCustomHoliday() {
+        String date = inputDate.getText().toString();
+        String name = inputName.getText().toString();
+
+        if (date.isEmpty() || name.isEmpty()) {
+            Toast.makeText(getContext(), "Please enter a valid date and name", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Ip newHoliday = new Ip(date, name, name); // Using localName & name the same
+
+        // Save to local database
+        new AddHolidayTask().execute(newHoliday);
+
+        // Clear input fields
+        inputDate.setText("");
+        inputName.setText("");
+    }
+
+    private void loadHolidaysFromDatabase() {
+        new LoadHolidaysTask().execute();
+    }
+
+    private void updateListView(List<Ip> holidays) {
+        List<String> holidayStrings = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (Ip holiday : holidays) {
+            LocalDate holidayDate = LocalDate.parse(holiday.getDate());
+            if (!holidayDate.isBefore(today)) {
+                holidayStrings.add(holiday.getLocalName() + " - " + holiday.getDate());
+            }
+        }
+
+        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, holidayStrings);
+        listView.setAdapter(adapter);
+    }
+
     private void navigateToDetail() {
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new EventDetailFragment())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    // AsyncTask to Save Holidays from API to Room Database
+    private class SaveHolidaysTask extends AsyncTask<List<Ip>, Void, Void> {
+        @Override
+        protected Void doInBackground(List<Ip>... lists) {
+            db.ipDao().deleteAllHolidays(); // Clear old data
+            db.ipDao().insertHolidays(lists[0]); // Save new data
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            loadHolidaysFromDatabase(); // Refresh UI
+        }
+    }
+
+    // AsyncTask to Add a Custom Holiday
+    private class AddHolidayTask extends AsyncTask<Ip, Void, Void> {
+        @Override
+        protected Void doInBackground(Ip... holidays) {
+            db.ipDao().insertCustomHoliday(holidays[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            loadHolidaysFromDatabase(); // Refresh UI
+        }
+    }
+
+    // AsyncTask to Load Holidays from Room Database
+    private class LoadHolidaysTask extends AsyncTask<Void, Void, List<Ip>> {
+        @Override
+        protected List<Ip> doInBackground(Void... voids) {
+            return db.ipDao().getAllHolidays();
+        }
+
+        @Override
+        protected void onPostExecute(List<Ip> holidays) {
+            updateListView(holidays);
+        }
     }
 }

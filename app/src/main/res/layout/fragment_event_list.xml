@@ -4,15 +4,7 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <!-- Text for Today's Date - Top of the screen -->
-
-    <!-- Event List Title Text -->
-
-
-    <!-- Button to go to event detail -->
-
-    <!-- ListView for holidays -->
-
+    <!-- Today's Date -->
     <TextView
         android:id="@+id/txt_today_date"
         android:layout_width="wrap_content"
@@ -26,27 +18,59 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
+    <!-- Button to fetch holidays from the Internet -->
     <Button
         android:id="@+id/btn_Get_Holiday_Web"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/txt_today_date"
-        android:layout_marginTop="73dp"
-        android:text="Get data" />
+        android:layout_marginTop="20dp"
+        android:text="Get Holidays from Internet" />
 
+    <!-- Input field for new holiday date -->
+    <EditText
+        android:id="@+id/input_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_Get_Holiday_Web"
+        android:layout_marginTop="20dp"
+        android:hint="Enter Date (YYYY-MM-DD)"
+        android:inputType="text" />
+
+    <!-- Input field for new holiday name -->
+    <EditText
+        android:id="@+id/input_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/input_date"
+        android:layout_marginTop="10dp"
+        android:hint="Enter Holiday Name"
+        android:inputType="text" />
+
+    <!-- Button to add new holiday -->
+    <Button
+        android:id="@+id/btn_add_holiday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/input_name"
+        android:layout_marginTop="10dp"
+        android:text="Add Custom Holiday" />
+
+    <!-- Button to go to event details -->
     <Button
         android:id="@+id/btn_go_to_detail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/btn_Get_Holiday_Web"
-        android:layout_marginTop="-105dp"
+        android:layout_below="@id/btn_add_holiday"
+        android:layout_marginTop="10dp"
         android:text="Go to Detail" />
 
+    <!-- ListView for displaying holidays -->
     <ListView
         android:id="@+id/List_Of_Holiday"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/btn_go_to_detail"
-        android:layout_marginTop="97dp" />
+        android:layout_marginTop="20dp" />
 
 </RelativeLayout>
