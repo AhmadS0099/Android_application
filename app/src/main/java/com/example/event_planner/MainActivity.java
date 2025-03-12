@@ -14,7 +14,8 @@ public class MainActivity extends AppCompatActivity {
         // Load LoginFragment when the app starts
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new LoginFragment())
+                    //.replace(R.id.fragment_container, new LoginFragment())
+                    .replace(R.id.fragment_container, new EventListFragment())
                     .commit();
         }
     }

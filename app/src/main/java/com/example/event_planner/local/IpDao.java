@@ -21,4 +21,8 @@ public interface IpDao {
 
     @Query("DELETE FROM holidays")
     void deleteAllHolidays();
+
+    // In IpDao.java
+    @Query("SELECT * FROM holidays WHERE date BETWEEN :startDate AND :endDate ORDER BY date ASC")
+    List<Ip> getEventsBetweenDates(String startDate, String endDate);
 }

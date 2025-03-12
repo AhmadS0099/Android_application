@@ -157,7 +157,7 @@ public class EventListFragment extends Fragment {
     private void navigateToDetail() {
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new EventDetailFragment())
-                .addToBackStack(null)
+                .addToBackStack("detail")
                 .commit();
     }
 

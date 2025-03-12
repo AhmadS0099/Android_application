@@ -6,16 +6,55 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Event Details"
-        android:textSize="24sp"/>
-
-    <!-- Back button -->
     <Button
         android:id="@+id/btn_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back"/>
+        android:layout_gravity="start"
+        android:text="Back to List"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Weekly Calendar"
+        android:textSize="24sp"
+        android:textStyle="bold"/>
+
+    <!-- Week Navigation -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginVertical="8dp">
+
+        <Button
+            android:id="@+id/btn_prev_week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="←"/>
+
+        <TextView
+            android:id="@+id/txt_week_range"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:layout_marginHorizontal="16dp"/>
+
+        <Button
+            android:id="@+id/btn_next_week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="→"/>
+    </LinearLayout>
+
+    <!-- Week Calendar (Dagen in rijen) -->
+    <TableLayout
+        android:id="@+id/calendar_table"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:stretchColumns="*"
+        android:shrinkColumns="*"/>
+
+
 </LinearLayout>
