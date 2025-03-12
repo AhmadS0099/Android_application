@@ -1,5 +1,6 @@
 package com.example.event_planner;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -74,6 +75,7 @@ public class EventListFragment extends Fragment {
         return view;
     }
 
+    @SuppressLint("SetTextI18n")
     private void setTodayDate() {
         LocalDate today = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
@@ -81,24 +83,37 @@ public class EventListFragment extends Fragment {
     }
 
     private void fetchHolidays() {
-        mService.getHolidays().enqueue(new Callback<List<Ip>>() {
+        // Stap 1: Verwijder alle bestaande data in de database
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            public void onResponse(Call<List<Ip>> call, Response<List<Ip>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    holidayList = response.body();
-
-                    // Save to local database (overwrite existing)
-                    new SaveHolidaysTask().execute(holidayList);
-                } else {
-                    Toast.makeText(getContext(), "No data found", Toast.LENGTH_SHORT).show();
-                }
+            protected Void doInBackground(Void... voids) {
+                db.ipDao().deleteAllHolidays(); // Wissen
+                return null;
             }
 
             @Override
-            public void onFailure(Call<List<Ip>> call, Throwable t) {
-                Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            protected void onPostExecute(Void aVoid) {
+                // Stap 2: Haal nieuwe data op na het wissen
+                mService.getHolidays().enqueue(new Callback<List<Ip>>() {
+                    @Override
+                    public void onResponse(Call<List<Ip>> call, Response<List<Ip>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            holidayList = response.body();
+
+                            // Stap 3: Sla nieuwe data op
+                            new SaveHolidaysTask().execute(holidayList);
+                        } else {
+                            Toast.makeText(getContext(), "Geen data gevonden", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<Ip>> call, Throwable t) {
+                        Toast.makeText(getContext(), "Fout: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-        });
+        }.execute();
     }
 
     private void addCustomHoliday() {

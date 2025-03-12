@@ -18,14 +18,14 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
-    <!-- Button to fetch holidays from the Internet -->
+    <!-- Button to fetch holidays from the Internet and reset the local databse-->
     <Button
         android:id="@+id/btn_Get_Holiday_Web"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/txt_today_date"
         android:layout_marginTop="20dp"
-        android:text="Get Holidays from Internet" />
+        android:text="Reset" />
 
     <!-- Input field for new holiday date -->
     <EditText

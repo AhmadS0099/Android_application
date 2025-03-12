@@ -25,4 +25,13 @@ public abstract class HolidayDatabase extends RoomDatabase {
         }
         return INSTANCE;
     }
+
+    // In HolidayDatabase.java
+    public static void deleteDatabase(Context context) {
+        if (INSTANCE != null) {
+            INSTANCE.close();
+            INSTANCE = null;
+        }
+        context.deleteDatabase("holiday_database"); // Exacte database naam
+    }
 }
