@@ -155,11 +155,22 @@ public class EventListFragment extends Fragment {
     }
 
     private void navigateToDetail() {
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new EventDetailFragment())
-                .addToBackStack("detail")
-                .commit();
+        EventDetailFragment detailFragment = new EventDetailFragment();
+
+        if (getActivity().findViewById(R.id.fragment_detail_container) != null) {
+            // Dual-pane mode: update the detail container.
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_detail_container, detailFragment)
+                    .commit();
+        } else {
+            // Single-pane mode: replace the current fragment and add to back stack.
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, detailFragment)
+                    .addToBackStack("detail")
+                    .commit();
+        }
     }
+
 
     // AsyncTask to Save Holidays from API to Room Database
     private class SaveHolidaysTask extends AsyncTask<List<Ip>, Void, Void> {
