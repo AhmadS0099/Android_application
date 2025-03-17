@@ -1,60 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/btn_back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:text="Back to List"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Weekly Calendar"
-        android:textSize="24sp"
-        android:textStyle="bold"/>
-
-    <!-- Week Navigation -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginVertical="8dp">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <Button
-            android:id="@+id/btn_prev_week"
+            android:id="@+id/btn_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="←"/>
+            android:layout_gravity="start"
+            android:text="Back to List"/>
 
         <TextView
-            android:id="@+id/txt_week_range"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:layout_marginHorizontal="16dp"/>
+            android:text="Weekly Calendar"
+            android:textSize="24sp"
+            android:textStyle="bold"/>
 
-        <Button
-            android:id="@+id/btn_next_week"
-            android:layout_width="wrap_content"
+        <!-- Week Navigation -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="→"/>
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginVertical="8dp">
+
+            <Button
+                android:id="@+id/btn_prev_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="←"/>
+
+            <TextView
+                android:id="@+id/txt_week_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_marginHorizontal="16dp"/>
+
+            <Button
+                android:id="@+id/btn_next_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="→"/>
+        </LinearLayout>
+
+        <!-- Week Calendar (Rows for days) -->
+        <TableLayout
+            android:id="@+id/calendar_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*"
+            android:shrinkColumns="*"/>
+
     </LinearLayout>
-
-    <!-- Week Calendar (Dagen in rijen) -->
-    <TableLayout
-        android:id="@+id/calendar_table"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:stretchColumns="*"
-        android:shrinkColumns="*"/>
-
-
-</LinearLayout>
+</ScrollView>
