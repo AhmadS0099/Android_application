@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.event_planner.local.HolidayDatabase;
 import com.example.event_planner.model.Ip;
@@ -96,7 +98,6 @@ public class EventDetailFragment extends Fragment {
 
         @Override
         protected void onPostExecute(List<Ip> events) {
-            // Bouw de kalender op
             for (int i = 0; i < 7; i++) {
                 LocalDate date = currentWeekStart.plusDays(i);
                 List<Ip> dailyEvents = filterEventsForDate(events, date);
@@ -107,10 +108,21 @@ public class EventDetailFragment extends Fragment {
                         TableRow.LayoutParams.MATCH_PARENT,
                         TableRow.LayoutParams.WRAP_CONTENT));
 
-                // Dag en datum
+                // Dag en datum (klikbaar)
                 TextView tvDate = new TextView(requireContext());
                 tvDate.setText(date.format(DateTimeFormatter.ofPattern("E\nd MMM")));
-                tvDate.setPadding(8, 8, 8, 8);
+                tvDate.setPadding(16, 16, 16, 16);
+                tvDate.setBackgroundResource(R.drawable.clickable_background); // Zorg voor een visuele feedback
+                tvDate.setGravity(Gravity.CENTER);
+                tvDate.setClickable(true);
+                tvDate.setFocusable(true);
+
+                // Kliklistener voor de datum
+                tvDate.setOnClickListener(v -> {
+                    Toast.makeText(requireContext(), "Geselecteerde datum: " + date, Toast.LENGTH_SHORT).show();
+                    // Hier kun je navigeren naar een detailpagina of andere acties uitvoeren
+                });
+
                 row.addView(tvDate);
 
                 // Events voor deze dag
@@ -120,6 +132,15 @@ public class EventDetailFragment extends Fragment {
                     TextView tvEvent = new TextView(requireContext());
                     tvEvent.setText("• " + event.getLocalName());
                     tvEvent.setPadding(8, 4, 8, 4);
+                    tvEvent.setClickable(true);  // Maak ook events klikbaar
+                    tvEvent.setFocusable(true);
+
+                    // Kliklistener voor events
+                    tvEvent.setOnClickListener(v -> {
+                        Toast.makeText(requireContext(), "Event: " + event.getLocalName(), Toast.LENGTH_SHORT).show();
+                        // Voeg navigatie toe naar eventdetails indien gewenst
+                    });
+
                     eventsLayout.addView(tvEvent);
                 }
                 row.addView(eventsLayout);
@@ -127,6 +148,7 @@ public class EventDetailFragment extends Fragment {
                 calendarTable.addView(row);
             }
         }
+
 
         private List<Ip> filterEventsForDate(List<Ip> events, LocalDate date) {
             List<Ip> result = new ArrayList<>();
