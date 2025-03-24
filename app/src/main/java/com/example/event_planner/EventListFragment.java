@@ -153,7 +153,7 @@ public class EventListFragment extends Fragment {
                     .commit();
         } else {
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, detailFragment)
+                    .replace(R.id.fragment_list_container, detailFragment)
                     .addToBackStack("detail")
                     .commit();
         }

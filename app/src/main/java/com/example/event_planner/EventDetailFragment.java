@@ -145,7 +145,7 @@ public class EventDetailFragment extends Fragment {
                         args.putString("SELECTED_DATE", formattedDate);
                         listFragment.setArguments(args);
                         getParentFragmentManager().beginTransaction()
-                                .replace(R.id.fragment_container, listFragment)
+                                .replace(R.id.fragment_list_container, listFragment)
                                 .addToBackStack(null) // So the user can navigate back
                                 .commit();
                     }
